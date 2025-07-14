@@ -10,10 +10,22 @@ import javax.servlet.http.*;
 public class RoomView extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         RoomDAO dao = new RoomDAO();
-        ArrayList<Room> list = dao.getAllRooms();
-        request.setAttribute("roomList", list);
-        RequestDispatcher rd = request.getRequestDispatcher("RoomView.jsp");
-        rd.forward(request, response);
+        String selectedBlock = request.getParameter("block");
+
+        ArrayList<Room> roomList;
+        if (selectedBlock == null || selectedBlock.equals("ALL")) {
+            roomList = dao.getAllRooms();  // Show all rooms
+        } else {
+            roomList = dao.getRoomsByBlock(selectedBlock);  // Filtered by block
+        }
+
+        ArrayList<String> blockList = dao.getUniqueBlocks();
+
+        request.setAttribute("roomList", roomList);
+        request.setAttribute("blockList", blockList);
+        request.setAttribute("selectedBlock", selectedBlock);
+        request.getRequestDispatcher("RoomView.jsp").forward(request, response);
     }
 }
